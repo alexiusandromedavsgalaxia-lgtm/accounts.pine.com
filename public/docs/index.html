@@ -146,7 +146,77 @@ const preferences = result.data.find(
 const { account } = await response.json();</code></pre><h3>Handling authentication failures</h3><p>A client should treat <code>401</code> as a signal that it needs a valid session. The recommended browser behavior is to return to the sign-in surface rather than storing a copy of a session token or attempting to manufacture one.</p></section>
 <section id="schema-reference" class="section"><h2>Schema reference</h2><h3><code>users</code></h3><table><tr><th>Field</th><th>Constraint</th><th>Description</th></tr><tr><td>id</td><td>PRIMARY KEY</td><td>Stable UUID.</td></tr><tr><td>name</td><td>NOT NULL</td><td>Display name.</td></tr><tr><td>email</td><td>NOT NULL, UNIQUE</td><td>Sign-in identity.</td></tr><tr><td>password_hash</td><td>NOT NULL</td><td>Derived password value.</td></tr><tr><td>salt</td><td>NOT NULL</td><td>Per-user derivation salt.</td></tr><tr><td>created_at</td><td>NOT NULL</td><td>Creation time.</td></tr></table><h3><code>sessions</code></h3><table><tr><th>Field</th><th>Purpose</th></tr><tr><td>token_hash</td><td>Derived session token, primary key.</td></tr><tr><td>user_id</td><td>Owning account.</td></tr><tr><td>expires_at</td><td>Expiration boundary.</td></tr></table><h3><code>account_data</code></h3><table><tr><th>Field</th><th>Purpose</th></tr><tr><td>id</td><td>Record UUID.</td></tr><tr><td>user_id</td><td>Owning account.</td></tr><tr><td>key</td><td>Application-defined key.</td></tr><tr><td>value</td><td>Text or serialized JSON.</td></tr><tr><td>created_at</td><td>Creation time.</td></tr><tr><td>updated_at</td><td>Latest write.</td></tr></table></section>
 <section id="security-model" class="section"><h2>Security model and operational guidance</h2><p>Pine separates browser presentation from server-side authorization. The React application can request an endpoint, but it does not decide which user owns a record. That decision is made from the authenticated session on the server.</p><ul><li>Never put D1 binding names, secrets or server credentials into client JavaScript.</li><li>Never commit a Developer API key to a repository.</li><li>Never use the generic data endpoint as a SQL execution mechanism.</li><li>Do not rely on the user-supplied <code>user_id</code> as an authorization decision.</li><li>Use HTTPS in every deployed environment.</li><li>Invalidate sessions through the supported logout flow.</li><li>Review API changes together with database changes.</li></ul><div class="callout info"><b>Production note</b><span>The current implementation is a compact account platform. Features such as password reset, email verification, MFA, API-key rotation and fine-grained developer permissions require dedicated implementations before being represented as production security guarantees.</span></div></section>
-<section id="roadmap" class="section"><h2>Platform roadmap boundaries</h2><p>The following concepts may appear in the product interface or surrounding Pine projects, but they are not automatically part of the current API contract: project management, service publishing, credential rotation, binary photo storage, MFA, password recovery, email verification, audit logs and organization/team accounts.</p><p>When any of these become implemented, their endpoints, schemas, authorization rules, lifecycle states and migration strategy should be documented here rather than inferred from a visual placeholder.</p></section></main></div>
+<section id="roadmap" class="section"><h2>Platform roadmap boundaries</h2><p>The following concepts may appear in the product interface or surrounding Pine projects, but they are not automatically part of the current API contract: project management, service publishing, credential rotation, binary photo storage, MFA, password recovery, email verification, audit logs and organization/team accounts.</p><p>When any of these become implemented, their endpoints, schemas, authorization rules, lifecycle states and migration strategy should be documented here rather than inferred from a visual placeholder.</p></section>
+<section id="architecture" class="section"><h2>Architecture in depth</h2>
+<p>Pine Accounts is divided into a browser application, Pages Functions and three D1 databases. The browser is responsible for presentation and user interaction. The server-side Functions are the authorization boundary. D1 stores identity, developer metadata and generic account-owned data in separate logical databases.</p>
+<h3>Request lifecycle</h3><ol><li>The browser sends a request to a Pages Function.</li><li>The Function reads the <code>pine_session</code> cookie when authentication is required.</li><li>The session token is derived with the session-specific PBKDF2 configuration.</li><li>The derived value is compared against the session table and its expiration.</li><li>The authenticated user ID becomes the ownership boundary for subsequent queries.</li><li>The Function executes a parameterized D1 query and returns JSON.</li></ol>
+<h3>Database separation</h3><p>The <code>accounts</code> binding owns primary identity and sessions. <code>developeraccounts</code> owns the one-to-one developer extension. <code>dataacc</code> owns generic account data. This separation makes the ownership model explicit and keeps the generic data store from becoming the identity database.</p>
+</section>
+<section id="requests" class="section"><h2>Request and response conventions</h2>
+<p>JSON APIs use JSON request bodies and JSON responses. Successful protected data responses are marked <code>Cache-Control: no-store</code>. Clients should treat unknown response fields as forward-compatible additions rather than depending on object key order.</p>
+<h3>Content type</h3><p>For JSON writes, send <code>Content-Type: application/json</code>. A malformed body is rejected rather than interpreted as form data.</p>
+<h3>Ownership rule</h3><p>Protected endpoints derive ownership from the session. A client should never attempt to impersonate another account by changing a <code>user_id</code> field in a request body.</p>
+</section>
+<section id="integration" class="section"><h2>Integration patterns</h2>
+<h3>Browser integration</h3><pre><code>const response = await fetch("/api/data?scope=data");
+const result = await response.json();</code></pre>
+<p>For same-origin browser integrations, the browser can manage the Pine cookie automatically. Applications should not copy the session token into localStorage.</p>
+<h3>Reading a preference</h3><pre><code>const result = await fetch("/api/data?scope=data").then(r =&gt; r.json());
+const theme = result.data?.find(item =&gt; item.key === "theme");</code></pre>
+<h3>Writing structured data</h3><pre><code>await fetch("/api/data?scope=data", {
+  method: "POST",
+  headers: {"Content-Type": "application/json"},
+  body: JSON.stringify({
+    key: "preferences",
+    value: {theme: "dark", language: "es"}
+  })
+});</code></pre>
+<h3>Idempotent key writes</h3><p>Because <code>user_id + key</code> is unique, writing the same key repeatedly updates the existing record. This makes preference synchronization naturally idempotent when the latest value should win.</p>
+</section>
+<section id="api-details" class="section"><h2>API behavior details</h2>
+<table><thead><tr><th>Condition</th><th>Behavior</th></tr></thead><tbody>
+<tr><td>No session</td><td>Protected route returns HTTP 401.</td></tr>
+<tr><td>Invalid scope</td><td>HTTP 400 with the supported scope names.</td></tr>
+<tr><td>Unsupported method</td><td>HTTP 405.</td></tr>
+<tr><td>Duplicate account email</td><td>Registration/update rejects the conflict.</td></tr>
+<tr><td>Invalid email</td><td>Validation error.</td></tr>
+<tr><td>Missing data key</td><td>Data write is rejected.</td></tr>
+<tr><td>Unknown developer field</td><td>It is not included in the editable field set.</td></tr>
+</tbody></table>
+<h3>Account scope</h3><p>The account scope exposes only the identity fields intended for the account surface. Password hashes, salts and session tokens are not returned by the public account-data response.</p>
+<h3>Developer scope</h3><p>The developer scope returns the complete developer record because it is an administrative surface for the authenticated owner. The API key remains a credential and should not be copied into public client code.</p>
+<h3>Data scope</h3><p>The data scope lists records ordered by key. Each record includes its ID, key, stored value and timestamps.</p>
+</section>
+<section id="schema" class="section"><h2>Schema reference</h2>
+<h3><code>users</code></h3><p>Primary identity table. The email is unique. The password representation is salted and derived.</p>
+<h3><code>sessions</code></h3><p>Session table containing a derived token, owning user ID and expiration timestamp. The active-session query requires the expiration to be later than the current database time.</p>
+<h3><code>developer_accounts</code></h3><p>The developer table has thirteen fields and a unique <code>user_id</code>. Creation timestamps and update timestamps are stored independently so consumers can distinguish record creation from later metadata changes.</p>
+<h3><code>account_data</code></h3><p>Generic account storage with a uniqueness constraint over <code>user_id,key</code>. Values are text at the D1 layer, with non-string JavaScript values serialized to JSON before storage.</p>
+</section>
+<section id="security-model" class="section"><h2>Security model</h2>
+<h3>Password handling</h3><p>The application never needs to retrieve the original password from D1. Registration creates a salt and stores only the derived value. Login repeats the derivation using the stored salt.</p>
+<h3>Session handling</h3><p>The raw browser token is carried by an HttpOnly Secure cookie. Server code derives it before database lookup. Logout removes the corresponding session record and expires the cookie.</p>
+<h3>SQL safety</h3><p>Dynamic user values are passed through parameter bindings rather than concatenated into SQL statements. The developer update path restricts writable column names to an explicit allowlist.</p>
+<h3>Cache safety</h3><p>Authenticated data responses use <code>no-store</code>. This is important for account information because a cached authenticated response could otherwise outlive the request context.</p>
+<h3>Client-side boundaries</h3><p>Theme preference is intentionally local UI state. It is not used as an authentication mechanism and must never be treated as proof of account ownership.</p>
+</section>
+<section id="deployment-guide" class="section"><h2>Deployment guide</h2>
+<p>The project is designed for Cloudflare Pages with the <code>dist</code> build output and Pages Functions under <code>functions/</code>. The D1 bindings in <code>wrangler.toml</code> must correspond to the production Pages configuration.</p>
+<h3>Required bindings</h3><table><thead><tr><th>Binding</th><th>Database</th><th>Purpose</th></tr></thead><tbody><tr><td><code>accounts</code></td><td>accounts</td><td>Identity and sessions.</td></tr><tr><td><code>developeraccounts</code></td><td>developer-accounts</td><td>Developer records.</td></tr><tr><td><code>dataacc</code></td><td>account-data</td><td>Generic account data.</td></tr></tbody></table>
+<h3>Production checklist</h3><ol><li>Build the Vite application.</li><li>Publish the generated <code>dist</code> directory.</li><li>Deploy the <code>functions</code> directory as Pages Functions.</li><li>Verify every D1 binding exists in the Pages project.</li><li>Verify the production hostname uses HTTPS.</li><li>Test registration, login, <code>/me</code>, logout and protected data routes.</li></ol>
+</section>
+<section id="testing" class="section"><h2>Testing checklist</h2>
+<ul><li>Create a fresh test account with a unique email.</li><li>Confirm registration returns a user and establishes a session.</li><li>Reload the page and verify <code>/api/auth/me</code> resolves the session.</li><li>Sign out and verify protected routes return 401.</li><li>Sign back in from another browser/device and verify the same account identity is resolved.</li><li>Create a Developer Account and verify the one-to-one constraint.</li><li>Write a data key, read it back, update it and verify the same key is replaced.</li><li>Try an invalid scope and confirm HTTP 400.</li><li>Try another account's ID in a client payload and verify it does not change ownership.</li></ul>
+</section>
+<section id="compatibility" class="section"><h2>Compatibility and evolution</h2>
+<p>Clients should depend on documented paths and fields rather than internal implementation details. New fields may be added to responses. A client should ignore fields it does not understand.</p>
+<p>API keys, session cookies and database identifiers have different purposes. A database ID is not automatically an authorization credential. A session token is not an API key. An API key should not be treated as a substitute for a browser session unless a future API explicitly documents that behavior.</p>
+</section>
+<section id="glossary" class="section"><h2>Glossary</h2>
+<table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody>
+<tr><td>Pine Account</td><td>Primary user identity.</td></tr><tr><td>Developer Account</td><td>Optional developer profile attached one-to-one to a Pine Account.</td></tr><tr><td>Account Data</td><td>Generic key/value records owned by an account.</td></tr><tr><td>Session</td><td>Temporary authenticated browser authorization.</td></tr><tr><td>API key</td><td>Developer credential generated for the Developer Account.</td></tr><tr><td>D1</td><td>Cloudflare's SQL database service used by the application.</td></tr><tr><td>Binding</td><td>Server-side name used by a Pages Function to access a configured D1 database.</td></tr><tr><td>Scope</td><td>Requested data domain for the generic data endpoint.</td></tr></tbody></table>
+</section>
+</main></div>
 <footer>© 2026 Pine Accounts · Technical Documentation · <a href="/">Pine Accounts</a></footer>
 <script>
 const btn=document.getElementById("theme");
