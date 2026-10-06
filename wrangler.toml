@@ -11,3 +11,8 @@ database_id = "a363ae0d-365d-46a0-aec1-50417420d5f6"
 binding = "developeraccounts"
 database_name = "developer-accounts"
 database_id = "6d6d27b8-0136-4ee3-9a11-1eb41294ea75"
+
+[[d1_databases]]
+binding = "dataacc"
+database_name = "account-data"
+database_id = "557f8b20-db3a-4b4a-9eed-e69e41baf8f0"
