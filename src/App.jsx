@@ -122,17 +122,18 @@ function Account({ user, setUser, setDev }) {
 }
 
 function Developer({ setDev }) {
-  const [busy, setBusy] = useState(false);
-  const [done, setDone] = useState(false);
+  const [account, setAccount] = useState(null);
+  const [busy, setBusy] = useState(true);
+  const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
-  const [section, setSection] = useState(null);
+  const [section, setSection] = useState("Account");
 
-  const create = async () => {
+  const load = async () => {
     setBusy(true);
     setError("");
     try {
-      await api("/api/developer", { method: "POST" });
-      setDone(true);
+      const data = await api("/api/developer");
+      setAccount(data.account);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -140,11 +141,36 @@ function Developer({ setDev }) {
     }
   };
 
-  const sections = {
-    Projects: ["Your Pine projects", "Create and manage projects connected to your developer account."],
-    Credentials: ["Developer credentials", "API keys and developer access will appear here when configured."],
-    Services: ["Pine services", "Connect and manage the Pine services available to your projects."],
+  useEffect(() => { load(); }, []);
+
+  const create = async () => {
+    setCreating(true);
+    setError("");
+    try {
+      const data = await api("/api/developer", { method: "POST" });
+      setAccount(data.account);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setCreating(false);
+    }
   };
+
+  const columns = [
+    ["ID", "id"],
+    ["User ID", "user_id"],
+    ["Name", "name"],
+    ["Email", "email"],
+    ["Company", "company"],
+    ["Website", "website"],
+    ["Description", "description"],
+    ["Plan", "plan"],
+    ["Status", "status"],
+    ["API key", "api_key"],
+    ["API key created at", "api_key_created_at"],
+    ["Created at", "created_at"],
+    ["Updated at", "updated_at"],
+  ];
 
   return (
     <div className="developer-shell page-enter">
@@ -153,33 +179,77 @@ function Developer({ setDev }) {
           <Logo />
           <button className="text-button" onClick={() => setDev(false)}>Account</button>
         </div>
+
         <div className="developer-icon">⌘</div>
-        <div className="account-copy"><h1>Pine Developer</h1><p>Build, test and ship with Pine.</p></div>
+        <div className="account-copy">
+          <h1>Pine Developer</h1>
+          <p>Developer Account · D1 developer_accounts</p>
+        </div>
 
         <div className="developer-list">
-          {Object.entries(sections).map(([key, value]) => (
+          {["Account", "Projects", "Credentials", "Services"].map((key) => (
             <button className="developer-item" key={key} onClick={() => setSection(section === key ? null : key)}>
-              <span className="developer-item-copy"><b>{key}</b><small>{value[1]}</small></span>
+              <span className="developer-item-copy">
+                <b>{key}</b>
+                <small>
+                  {key === "Account" ? "Developer account data and identity" :
+                   key === "Projects" ? "Projects linked to this developer account" :
+                   key === "Credentials" ? "API credentials and access" :
+                   "Pine services available to this account"}
+                </small>
+              </span>
               <i>{section === key ? "⌃" : "›"}</i>
             </button>
           ))}
         </div>
 
-        {section && (
+        {section === "Account" && (
+          <div className="developer-data-panel">
+            {busy ? (
+              <div className="developer-loading">Loading developer account…</div>
+            ) : account ? (
+              <div className="developer-fields">
+                {columns.map(([label, key]) => (
+                  <div className="developer-field" key={key}>
+                    <span>{label}</span>
+                    <b className={key === "api_key" ? "api-key-value" : ""}>{account[key] || "—"}</b>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="developer-empty">
+                <b>No Developer Account yet.</b>
+                <span>Create one to populate all 13 developer_accounts columns.</span>
+                <button className="continue-button" onClick={create} disabled={creating}>
+                  <span>{creating ? "Creating…" : "Create Developer Account"}</span><span className="arrow">›</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {section === "Projects" && (
           <div className="developer-panel">
-            <b>{sections[section][0]}</b>
-            <span>{sections[section][1]}</span>
+            <b>Developer Projects</b>
+            <span>The developer_projects data will appear here when projects are created.</span>
+          </div>
+        )}
+
+        {section === "Credentials" && (
+          <div className="developer-panel">
+            <b>Developer Credentials</b>
+            <span>The API key stored in developer_accounts is shown in Account. Credential management can be added here without inventing extra account columns.</span>
+          </div>
+        )}
+
+        {section === "Services" && (
+          <div className="developer-panel">
+            <b>Pine Services</b>
+            <span>Services connected to this developer account will appear here.</span>
           </div>
         )}
 
         {error && <div className="error-message">{error}</div>}
-        {done ? (
-          <div className="success-message"><b>Developer Account ready.</b><span>Your Pine developer workspace has been created.</span></div>
-        ) : (
-          <button className="continue-button" onClick={create} disabled={busy}>
-            <span>{busy ? "Creating…" : "Create Developer Account"}</span><span className="arrow">›</span>
-          </button>
-        )}
       </div>
     </div>
   );
