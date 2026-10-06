@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pine Accounts Documentation</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;color:#1d1d1f;background:#f5f5f7;line-height:1.55}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0}
+header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.86);backdrop-filter:blur(18px);border-bottom:1px solid #e5e5e7;padding:14px 5vw;display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:700;font-size:20px}.brand span{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:9px;background:#111;color:#fff;margin-right:9px}
+header a{color:#0071e3;text-decoration:none;margin-left:18px}
+.layout{max-width:1320px;margin:auto;display:grid;grid-template-columns:245px minmax(0,1fr);gap:50px;padding:42px 28px}
+aside{position:sticky;top:78px;height:calc(100vh - 100px);overflow:auto}
+aside h3{margin:0 0 4px}.muted{color:#6e6e73;font-size:13px}
+aside a{display:block;padding:7px 10px;border-radius:8px;color:#424245;text-decoration:none;font-size:14px}
+aside a:hover{background:#e8e8ed;color:#0071e3}
+main{min-width:0}.hero{padding:35px 0 70px}.kicker{font-size:12px;font-weight:700;letter-spacing:.12em;color:#0071e3}
+h1{font-size:clamp(42px,7vw,72px);line-height:1.02;letter-spacing:-.045em;margin:12px 0 20px}.hero p{font-size:20px;color:#6e6e73;max-width:850px}
+.section{padding:42px 0;border-top:1px solid #d2d2d7;scroll-margin-top:85px}h2{font-size:34px;letter-spacing:-.025em;margin:0 0 14px}h3{margin-top:30px;font-size:21px}p{max-width:900px}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;background:#e8e8ed;border-radius:5px;padding:2px 5px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:25px 0}.card,.callout,.endpoint{background:#fff;border:1px solid #e5e5e7;border-radius:16px;padding:17px}.card b,.card span{display:block}.card span{color:#6e6e73;margin-top:4px;font-size:14px}
+.callout{background:#eef7ff;border-color:#cfe8ff}.callout span{display:block;margin-top:5px}
+.endpoint{margin:18px 0;padding:0;overflow:hidden}.ephead{display:flex;gap:10px;align-items:center;padding:13px 16px;border-bottom:1px solid #e5e5e7}.method{font-size:11px;font-weight:800;padding:4px 7px;border-radius:6px;color:#fff}.get{background:#16803c}.post{background:#0071e3}.put{background:#8b5cf6}.auth{margin-left:auto;color:#6e6e73;font-size:12px}.epbody{padding:16px}
+pre{overflow:auto;background:#171719;color:#f5f5f7;border-radius:12px;padding:17px;line-height:1.5}pre code{background:none;padding:0;color:inherit}
+table{border-collapse:collapse;width:100%;margin:20px 0;background:#fff;border:1px solid #e5e5e7;border-radius:12px;overflow:hidden}th,td{text-align:left;padding:11px 13px;border-bottom:1px solid #e5e5e7;vertical-align:top}th{background:#f5f5f7}tr:last-child td{border-bottom:0}
+li{margin:7px 0}.links a{display:inline-block;margin-right:12px;color:#0071e3}
+footer{padding:45px 5vw;color:#6e6e73;text-align:center}
+@media(max-width:850px){.layout{grid-template-columns:1fr;padding:25px 18px}.sidebar{display:none}aside{display:none}.hero{padding:25px 0 45px}h1{font-size:45px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><span>P</span>Pine Accounts</div><nav><a href="/">Open Pine Accounts</a><a href="#endpoints">API</a></nav></header>
+<div class="layout">
+<aside><h3>Pine Accounts</h3><div class="muted">Complete documentation</div>
+<nav>
+<a href="#overview">Overview</a><a href="#navigation">Site navigation</a><a href="#authentication">Authentication</a><a href="#account">Pine Account</a><a href="#developer">Developer Account</a><a href="#data-api">Account Data API</a><a href="#api-auth">API authentication</a><a href="#database">Database architecture</a><a href="#endpoints">Endpoint reference</a><a href="#errors">Errors & status codes</a><a href="#frontend">Frontend architecture</a><a href="#security">Security model</a><a href="#limits">Validation & limits</a><a href="#deployment">Deployment</a><a href="#roadmap">Current scope</a>
+</nav></aside>
+<main>
+<section class="hero"><div class="kicker">PINE ACCOUNTS</div><h1>Complete documentation.</h1><p>Everything currently exposed by Pine Accounts: the interface, authentication flow, Developer Account, D1 storage and the unified account data API.</p><div class="links"><a href="/">Open Pine Accounts</a><a href="#endpoints">Jump to API</a></div></section>
+
+<section id="overview" class="section"><h2>Overview</h2><p>Pine Accounts is a React + Vite account portal deployed on Cloudflare Pages. It provides a Pine Account identity, persistent browser sessions, a Developer Account area and authenticated access to account data.</p>
+<div class="grid"><div class="card"><b>Frontend</b><span>React + Vite</span></div><div class="card"><b>Hosting</b><span>Cloudflare Pages</span></div><div class="card"><b>Storage</b><span>Cloudflare D1</span></div><div class="card"><b>Session cookie</b><span><code>pine_session</code></span></div><div class="card"><b>Auth API</b><span><code>/api/auth/*</code></span></div><div class="card"><b>Data API</b><span><code>/api/data</code></span></div></div></section>
+
+<section id="navigation" class="section"><h2>Site navigation</h2><h3>Signed-out state</h3><p>The header shows the Pine identity and two actions: Sign in and Create Account. The main card switches between authentication forms without leaving the page.</p><h3>Signed-in state</h3><p>The header changes to an Account/Developer switch. Account is the default authenticated view. Developer loads its data from <code>/api/developer</code>.</p><h3>Account screen</h3><ul><li>Displays the user's name and email.</li><li>Account details expands the account information panel.</li><li>Developer Account opens the developer area.</li><li>Sign out destroys the current session server-side and clears the cookie.</li></ul><h3>Developer screen</h3><p>The Developer screen has four sections: Account, Projects, Credentials and Services. Account is the fully populated section in the current implementation.</p></section>
+
+<section id="authentication" class="section"><h2>Authentication</h2><p>Authentication is handled by <code>/api/auth/*</code>. Passwords are never stored as plaintext. A per-user random salt is stored with the user record and the password is derived with PBKDF2 using SHA-256 and 100,000 iterations.</p>
+<div class="endpoint"><div class="ephead"><span class="method post">POST</span><code>/api/auth/register</code><span class="auth">public</span></div><div class="epbody"><p>Creates a Pine Account and starts a 30-day session.</p><pre><code>{
+  "name": "Alex",
+  "email": "alex@example.com",
+  "password": "at-least-8-characters"
+}</code></pre><p>Success returns <code>201</code>, a public user object and an HttpOnly <code>pine_session</code> cookie.</p></div></div>
+<div class="endpoint"><div class="ephead"><span class="method post">POST</span><code>/api/auth/login</code><span class="auth">public</span></div><div class="epbody"><p>Checks the supplied email and password and starts a new 30-day session.</p><pre><code>{
+  "email": "alex@example.com",
+  "password": "your-password"
+}</code></pre></div></div>
+<div class="endpoint"><div class="ephead"><span class="method get">GET</span><code>/api/auth/me</code><span class="auth">session</span></div><div class="epbody"><p>Returns the current user when a valid session exists. With no session, <code>user</code> is <code>null</code>.</p><pre><code>{ "user": { "id": "...", "name": "...", "email": "..." } }</code></pre></div></div>
+<div class="endpoint"><div class="ephead"><span class="method post">POST</span><code>/api/auth/logout</code><span class="auth">session</span></div><div class="epbody"><p>Deletes the current session record and expires the cookie.</p><pre><code>{ "ok": true }</code></pre></div></div></section>
+
+<section id="account" class="section"><h2>Pine Account</h2><p>The main account identity is stored in the <code>users</code> table of the <code>accounts</code> D1 database.</p>
+<table><thead><tr><th>Field</th><th>Meaning</th></tr></thead><tbody><tr><td><code>id</code></td><td>Stable UUID for the user.</td></tr><tr><td><code>name</code></td><td>Display name.</td></tr><tr><td><code>email</code></td><td>Unique sign-in email address.</td></tr><tr><td><code>password_hash</code></td><td>PBKDF2-derived password value.</td></tr><tr><td><code>salt</code></td><td>Per-user password salt.</td></tr><tr><td><code>created_at</code></td><td>Account creation timestamp.</td></tr></tbody></table>
+<p>The browser UI currently displays name, email and session status. Account edits are available through <code>/api/data?scope=account</code>.</p></section>
+
+<section id="developer" class="section"><h2>Developer Account</h2><p>A Developer Account is a separate record linked one-to-one with the Pine Account through <code>user_id</code>. Creating it generates a Pine API key and defaults the plan to <code>free</code> and status to <code>active</code>.</p>
+<table><thead><tr><th>#</th><th>Column</th><th>Purpose</th></tr></thead><tbody>
+<tr><td>1</td><td><code>id</code></td><td>Developer account UUID.</td></tr><tr><td>2</td><td><code>user_id</code></td><td>Owning Pine Account ID.</td></tr><tr><td>3</td><td><code>name</code></td><td>Developer display name.</td></tr><tr><td>4</td><td><code>email</code></td><td>Developer contact/sign-in email.</td></tr><tr><td>5</td><td><code>company</code></td><td>Optional company.</td></tr><tr><td>6</td><td><code>website</code></td><td>Optional website.</td></tr><tr><td>7</td><td><code>description</code></td><td>Optional developer description.</td></tr><tr><td>8</td><td><code>plan</code></td><td>Current plan, initially free.</td></tr><tr><td>9</td><td><code>status</code></td><td>Account status, initially active.</td></tr><tr><td>10</td><td><code>api_key</code></td><td>Generated Pine API credential.</td></tr><tr><td>11</td><td><code>api_key_created_at</code></td><td>Creation time for the API key.</td></tr><tr><td>12</td><td><code>created_at</code></td><td>Developer account creation time.</td></tr><tr><td>13</td><td><code>updated_at</code></td><td>Last update time.</td></tr>
+</tbody></table><h3>GET /api/developer</h3><p>Returns the developer record belonging to the authenticated Pine Account, or <code>null</code> when it does not exist.</p><h3>POST /api/developer</h3><p>Creates the developer record if one does not already exist. Repeating the request returns the existing record rather than creating a second one.</p><p>The UI intentionally shows all 13 columns. Projects, Credentials and Services are currently presentation areas for future functionality.</p></section>
+
+<section id="data-api" class="section"><h2>Account Data API</h2><p>The unified endpoint is <code>https://accounts.pine.com/api/data</code>. Every request must specify one of three scopes: <code>account</code>, <code>developer</code> or <code>data</code>. Authentication is based on the current <code>pine_session</code> cookie, so data is always resolved for the signed-in user.</p>
+<div class="callout"><b>Three scopes, one endpoint.</b><span><code>?scope=account</code> targets the Pine Account, <code>?scope=developer</code> targets the Developer Account, and <code>?scope=data</code> targets arbitrary user-owned key/value data.</span></div>
+<h3>GET /api/data?scope=account</h3><p>Reads the authenticated user's <code>id</code>, <code>name</code>, <code>email</code> and <code>created_at</code>.</p><h3>PUT or POST /api/data?scope=account</h3><p>Updates name and/or email.</p><pre><code>{
+  "name": "New name",
+  "email": "new@example.com"
+}</code></pre>
+<h3>GET /api/data?scope=developer</h3><p>Reads all 13 current <code>developer_accounts</code> columns for the signed-in owner.</p><h3>PUT or POST /api/data?scope=developer</h3><p>Updates only <code>name</code>, <code>email</code>, <code>company</code>, <code>website</code> and <code>description</code>. Identity, plan, status and API-key fields are not writable through this endpoint.</p><pre><code>{
+  "company": "Pine Labs",
+  "website": "https://example.com",
+  "description": "A Pine developer."
+}</code></pre>
+<h3>GET /api/data?scope=data</h3><p>Returns every key/value record owned by the authenticated user, ordered by key.</p><h3>POST or PUT /api/data?scope=data</h3><p>Creates or replaces one user-owned key/value entry. A repeated key updates the existing record because <code>user_id + key</code> is unique.</p><pre><code>{
+  "key": "theme",
+  "value": "dark"
+}</code></pre><p><code>value</code> can be a string, object, array, number, boolean or <code>null</code>. Non-string values are serialized to JSON.</p></section>
+
+<section id="api-auth" class="section"><h2>API authentication</h2><p>Protected endpoints look for the <code>pine_session</code> cookie. The raw session token is not compared directly with the database. The server derives a hash of the token with PBKDF2 and looks up the resulting <code>token_hash</code> in the sessions table, also checking that <code>expires_at</code> is still in the future.</p><p>The session cookie is configured as <code>HttpOnly</code>, <code>Secure</code> and <code>SameSite=Lax</code>, with a 30-day lifetime.</p><div class="callout"><b>Important:</b><span>Calling protected endpoints manually requires an authenticated browser/session context. The public URL alone does not grant access.</span></div></section>
+
+<section id="database" class="section"><h2>Database architecture</h2><table><thead><tr><th>Binding</th><th>D1 database</th><th>Current role</th></tr></thead><tbody><tr><td><code>accounts</code></td><td><code>accounts</code></td><td>Pine users and sessions.</td></tr><tr><td><code>developeraccounts</code></td><td><code>developer-accounts</code></td><td>Developer Account records.</td></tr><tr><td><code>dataacc</code></td><td><code>account-data</code></td><td>User-owned generic account data.</td></tr></tbody></table><h3>accounts</h3><p><code>users</code> contains identity and password material. <code>sessions</code> contains hashed session tokens, user IDs and expiration timestamps.</p><h3>developer-accounts</h3><p><code>developer_accounts</code> contains the 13-column Developer Account model.</p><h3>account-data</h3><p><code>account_data</code> contains <code>id</code>, <code>user_id</code>, <code>key</code>, <code>value</code>, <code>created_at</code> and <code>updated_at</code>, with a unique constraint on <code>user_id,key</code>.</p></section>
+
+<section id="endpoints" class="section"><h2>Endpoint reference</h2><table><thead><tr><th>Method</th><th>Path</th><th>Auth</th><th>Purpose</th></tr></thead><tbody>
+<tr><td>POST</td><td><code>/api/auth/register</code></td><td>No</td><td>Create account + session.</td></tr><tr><td>POST</td><td><code>/api/auth/login</code></td><td>No</td><td>Sign in + session.</td></tr><tr><td>GET</td><td><code>/api/auth/me</code></td><td>Cookie</td><td>Resolve current user.</td></tr><tr><td>POST</td><td><code>/api/auth/logout</code></td><td>Cookie</td><td>Destroy current session.</td></tr><tr><td>GET</td><td><code>/api/developer</code></td><td>Cookie</td><td>Read Developer Account.</td></tr><tr><td>POST</td><td><code>/api/developer</code></td><td>Cookie</td><td>Create Developer Account.</td></tr><tr><td>GET</td><td><code>/api/data?scope=account</code></td><td>Cookie</td><td>Read Pine Account.</td></tr><tr><td>PUT/POST</td><td><code>/api/data?scope=account</code></td><td>Cookie</td><td>Update Pine Account.</td></tr><tr><td>GET</td><td><code>/api/data?scope=developer</code></td><td>Cookie</td><td>Read Developer Account.</td></tr><tr><td>PUT/POST</td><td><code>/api/data?scope=developer</code></td><td>Cookie</td><td>Update editable developer fields.</td></tr><tr><td>GET</td><td><code>/api/data?scope=data</code></td><td>Cookie</td><td>Read generic account data.</td></tr><tr><td>POST/PUT</td><td><code>/api/data?scope=data</code></td><td>Cookie</td><td>Create/update a key/value record.</td></tr>
+</tbody></table></section>
+
+<section id="errors" class="section"><h2>Errors and status codes</h2><table><thead><tr><th>Status</th><th>Meaning</th></tr></thead><tbody><tr><td><code>200</code></td><td>Successful read or update.</td></tr><tr><td><code>201</code></td><td>New resource or data record created.</td></tr><tr><td><code>400</code></td><td>Invalid request body, scope or required field.</td></tr><tr><td><code>401</code></td><td>No valid Pine session.</td></tr><tr><td><code>405</code></td><td>HTTP method is not supported for that route.</td></tr><tr><td><code>409</code></td><td>Conflict, such as an email already belonging to another account.</td></tr><tr><td><code>500</code></td><td>Unexpected server/database error.</td></tr></tbody></table><p>JSON errors use an <code>error</code> property containing a human-readable message.</p></section>
+
+<section id="frontend" class="section"><h2>Frontend architecture</h2><p><code>src/App.jsx</code> contains the main React application and defines the Pine logo, input field, authentication view, account view and Developer view.</p><ul><li><b>Auth</b> owns registration/login form state and calls the auth API.</li><li><b>Account</b> owns the signed-in account screen and logout action.</li><li><b>Developer</b> loads and creates the Developer Account and controls its four sections.</li><li><b>App</b> checks <code>/api/auth/me</code> on startup and decides which view to render.</li></ul><p><code>src/styles.css</code> supplies the visual system, responsive developer data layout, loading states and page-entry animation.</p></section>
+
+<section id="security" class="section"><h2>Security model</h2><ul><li>Password material is derived with PBKDF2 rather than stored directly.</li><li>Each user has a separate password salt.</li><li>Session tokens are random and only their derived hashes are stored.</li><li>The session cookie is HttpOnly and Secure.</li><li>Protected queries scope records to the authenticated user's ID.</li><li>Developer updates use an explicit allow-list rather than accepting arbitrary column names.</li><li>Protected data responses are marked <code>Cache-Control: no-store</code>.</li></ul><p>The current API is an application-level account API, not a generic SQL interface. Clients cannot submit arbitrary SQL or request another user's records through these endpoints.</p></section>
+
+<section id="limits" class="section"><h2>Validation and limits</h2><table><thead><tr><th>Input</th><th>Current rule</th></tr></thead><tbody><tr><td>Registration name</td><td>Required, trimmed, max 80 characters.</td></tr><tr><td>Email</td><td>Basic email pattern validation and lowercase normalization.</td></tr><tr><td>Password</td><td>Minimum 8 characters at registration.</td></tr><tr><td>Developer short fields</td><td>Trimmed, max 300 characters.</td></tr><tr><td>Developer description</td><td>Trimmed, max 2,000 characters.</td></tr><tr><td>Generic data key</td><td>Trimmed, max 120 characters.</td></tr><tr><td>Generic data value</td><td>Stored as text; non-string JSON values are serialized.</td></tr><tr><td>Session</td><td>30-day cookie/session lifetime.</td></tr></tbody></table></section>
+
+<section id="deployment" class="section"><h2>Deployment</h2><p>The project is configured for Cloudflare Pages with Vite output in <code>./dist</code>. Wrangler declares three D1 bindings.</p><pre><code>pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "accounts"
+database_name = "accounts"
+
+[[d1_databases]]
+binding = "developeraccounts"
+database_name = "developer-accounts"
+
+[[d1_databases]]
+binding = "dataacc"
+database_name = "account-data"</code></pre><p>Cloudflare Pages supplies these D1 bindings to Functions through <code>c.env</code>.</p></section>
+
+<section id="roadmap" class="section"><h2>Current scope</h2><div class="grid"><div class="card"><b>Implemented</b><span>Registration, login, logout and session persistence.</span></div><div class="card"><b>Implemented</b><span>Account identity and authenticated account API.</span></div><div class="card"><b>Implemented</b><span>Developer Account creation and 13-column view.</span></div><div class="card"><b>Implemented</b><span>Developer, account and generic data API scopes.</span></div><div class="card"><b>UI placeholder</b><span>Developer Projects.</span></div><div class="card"><b>UI placeholder</b><span>Developer Services.</span></div><div class="card"><b>UI placeholder</b><span>Dedicated credential-management interface.</span></div><div class="card"><b>Not exposed</b><span>Generic arbitrary SQL or raw D1 table access.</span></div></div><p>This page documents the implementation currently present in the repository. When an endpoint, database field or UI flow changes, the documentation should change with it.</p></section>
+</main></div><footer>© 2026 Pine Accounts · Documentation</footer>
+</body></html>
