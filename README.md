@@ -1,10 +1,8 @@
-# accounts.pine.com
+# Pine Accounts
+React + Vite account portal for Cloudflare Pages.
 
-React + Vite interface for Cloudflare Pages with Cloudflare Pages Functions and D1.
+Includes sign in, registration, HttpOnly sessions, PBKDF2 password hashing, D1-backed accounts and a separate Developer Account flow.
 
-Bindings:
-- env.accounts -> accounts -> a363ae0d-365d-46a0-aec1-50417420d5f6
-- env.developeraccounts -> developer-accounts -> 6d6d27b8-0136-4ee3-9a11-1eb41294ea75
+Bindings: env.accounts -> accounts; env.developeraccounts -> developer-accounts.
 
-Build: npm run build
-Output: dist
+The browser does not receive generic D1 table dumps.

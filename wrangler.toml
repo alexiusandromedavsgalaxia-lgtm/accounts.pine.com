@@ -1,0 +1,13 @@
+name = "accounts-pine-com"
+compatibility_date = "2026-10-06"
+pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "accounts"
+database_name = "accounts"
+database_id = "a363ae0d-365d-46a0-aec1-50417420d5f6"
+
+[[d1_databases]]
+binding = "developeraccounts"
+database_name = "developer-accounts"
+database_id = "6d6d27b8-0136-4ee3-9a11-1eb41294ea75"
