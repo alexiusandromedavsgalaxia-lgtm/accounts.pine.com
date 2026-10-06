@@ -446,3 +446,77 @@ footer {
     display: none;
   }
 }
+
+.auth-links button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #0066cc;
+  cursor: pointer;
+  font-size: inherit;
+}
+
+.account-row-button {
+  width: 100%;
+  border-left: 0;
+  border-right: 0;
+  cursor: pointer;
+  background: transparent;
+  text-align: left;
+  transition: background .18s ease, padding .18s ease;
+}
+
+.account-row-button:hover {
+  background: #f5f5f7;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.details-panel,
+.developer-panel {
+  display: grid;
+  gap: 12px;
+  margin: -4px 0 16px;
+  padding: 14px 15px;
+  border-radius: 10px;
+  background: #f5f5f7;
+  border: 1px solid #e5e5e7;
+  animation: pageEnter .2s ease both;
+}
+
+.details-panel div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 12px;
+}
+
+.details-panel span,
+.developer-panel span { color: #6e6e73; }
+
+.details-panel b { font-weight: 500; }
+
+.developer-item {
+  width: 100%;
+  min-height: 62px;
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border: 0;
+  border-bottom: 1px solid #e5e5e7;
+  background: transparent;
+  color: #1d1d1f;
+  text-align: left;
+  cursor: pointer;
+}
+
+.developer-item:last-child { border-bottom: 0; }
+.developer-item:hover { background: #f5f5f7; }
+.developer-item-copy { display: grid; gap: 4px; }
+.developer-item b { font-size: 14px; font-weight: 600; }
+.developer-item small { color: #86868b; font-size: 12px; }
+.developer-item i { color: #86868b; font-size: 20px; font-style: normal; }
+.developer-panel { margin-top: 0; }
+.developer-panel b { font-size: 13px; }
