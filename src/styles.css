@@ -18,47 +18,30 @@ body {
 }
 
 button, input { font: inherit; }
-
 button { -webkit-tap-highlight-color: transparent; }
 
 .site {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 50% 34%, rgba(255,255,255,.98), rgba(245,245,247,.94) 38%, #f5f5f7 72%);
+  background: #f5f5f7;
 }
 
 .ambient {
-  position: absolute;
-  width: 70vw;
-  height: 70vw;
-  left: 15%;
-  top: 5%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,.95), transparent 68%);
-  filter: blur(24px);
-  pointer-events: none;
-  animation: ambientFloat 9s ease-in-out infinite alternate;
-}
-
-@keyframes ambientFloat {
-  to { transform: translate3d(0, 18px, 0) scale(1.025); }
+  display: none;
 }
 
 .site-header {
   height: 64px;
-  padding: 0 clamp(20px, 5vw, 72px);
+  padding: 0 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: relative;
   z-index: 3;
-  background: rgba(255,255,255,.72);
-  border-bottom: 1px solid rgba(0,0,0,.07);
-  backdrop-filter: saturate(180%) blur(22px);
+  background: rgba(255,255,255,.82);
+  border-bottom: 1px solid #d2d2d7;
+  backdrop-filter: saturate(180%) blur(20px);
 }
 
 .logo {
@@ -70,13 +53,13 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 
 .logo-mark {
-  width: 29px;
-  height: 29px;
+  width: 28px;
+  height: 28px;
   display: grid;
   place-items: center;
-  border-radius: 8px;
+  border-radius: 7px;
   background: #1d1d1f;
-  color: white;
+  color: #fff;
   font-size: 14px;
   font-weight: 700;
 }
@@ -88,96 +71,91 @@ button { -webkit-tap-highlight-color: transparent; }
 
 nav {
   display: flex;
-  gap: 5px;
+  align-items: center;
+  gap: 4px;
 }
 
 nav button,
 .text-button {
   border: 0;
   background: transparent;
-  color: #6e6e73;
-  padding: 8px 11px;
+  color: #0066cc;
+  padding: 9px 12px;
   border-radius: 9px;
   cursor: pointer;
-  font-size: 12px;
-  transition: background .22s ease, color .22s ease, transform .22s ease;
+  font-size: 13px;
+  transition: background .18s ease, color .18s ease;
 }
 
 nav button:hover,
 .text-button:hover {
-  background: rgba(0,0,0,.055);
-  color: #1d1d1f;
+  background: rgba(0,102,204,.08);
 }
 
 main {
   flex: 1;
-  position: relative;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  padding: 58px 18px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 72px 24px 90px;
 }
 
 .auth-shell,
 .account-shell,
 .developer-shell {
-  width: min(100%, 460px);
+  width: min(100%, 540px);
 }
 
 .auth-card,
 .account-card,
 .developer-card {
   width: 100%;
-  padding: 42px 43px;
-  border: 1px solid rgba(0,0,0,.075);
-  border-radius: 28px;
-  background: rgba(255,255,255,.86);
-  box-shadow:
-    0 30px 80px rgba(0,0,0,.09),
-    0 2px 8px rgba(0,0,0,.035);
-  backdrop-filter: blur(25px) saturate(150%);
+  padding: 48px;
+  border: 1px solid #d2d2d7;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(0,0,0,.06);
 }
 
 .page-enter {
-  animation: pageEnter .52s cubic-bezier(.22,1,.36,1) both;
+  animation: pageEnter .35s cubic-bezier(.22,1,.36,1) both;
 }
 
 @keyframes pageEnter {
-  from {
-    opacity: 0;
-    transform: translateY(13px) scale(.985);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.auth-card > .logo {
+  margin-bottom: 44px;
 }
 
 .auth-copy {
-  margin: 57px 0 31px;
+  margin: 0 0 28px;
 }
 
 .auth-copy h1,
 .account-copy h1 {
   margin: 0;
   color: #1d1d1f;
-  font-size: 31px;
-  line-height: 1.08;
+  font-size: 32px;
+  line-height: 1.1;
   letter-spacing: -.045em;
   font-weight: 650;
 }
 
 .auth-copy p,
 .account-copy p {
-  margin: 11px 0 0;
+  margin: 10px 0 0;
   color: #6e6e73;
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.45;
 }
 
 .auth-form {
   display: grid;
-  gap: 14px;
+  gap: 16px;
 }
 
 .field {
@@ -186,34 +164,32 @@ main {
 
 .field span {
   display: block;
-  margin: 0 0 7px 2px;
-  color: #6e6e73;
-  font-size: 11px;
+  margin: 0 0 7px;
+  color: #424245;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .field input {
   width: 100%;
   height: 52px;
   padding: 0 15px;
-  border: 1px solid #d2d2d7;
-  border-radius: 12px;
+  border: 1px solid #b9b9be;
+  border-radius: 10px;
   outline: none;
-  background: rgba(255,255,255,.82);
+  background: #fff;
   color: #1d1d1f;
-  transition:
-    border-color .2s ease,
-    box-shadow .2s ease,
-    background .2s ease;
+  font-size: 15px;
+  transition: border-color .18s ease, box-shadow .18s ease;
 }
 
 .field input:hover {
-  border-color: #b8b8bd;
+  border-color: #86868b;
 }
 
 .field input:focus {
   border-color: #0071e3;
-  background: white;
-  box-shadow: 0 0 0 4px rgba(0,113,227,.13);
+  box-shadow: 0 0 0 3px rgba(0,113,227,.16);
 }
 
 .continue-button {
@@ -225,27 +201,21 @@ main {
   align-items: center;
   justify-content: space-between;
   border: 0;
-  border-radius: 13px;
+  border-radius: 10px;
   background: #0071e3;
-  color: white;
+  color: #fff;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
-  box-shadow: 0 8px 20px rgba(0,113,227,.2);
-  transition:
-    transform .2s cubic-bezier(.22,1,.36,1),
-    filter .2s ease,
-    box-shadow .2s ease;
+  transition: filter .18s ease, transform .18s ease;
 }
 
 .continue-button:hover:not(:disabled) {
-  filter: brightness(1.04);
-  transform: translateY(-1px);
-  box-shadow: 0 11px 25px rgba(0,113,227,.25);
+  filter: brightness(1.05);
 }
 
 .continue-button:active:not(:disabled) {
-  transform: scale(.985);
+  transform: scale(.99);
 }
 
 .continue-button:disabled {
@@ -260,36 +230,38 @@ main {
 }
 
 .auth-switch {
-  margin: 25px 0 23px;
+  margin: 24px 0 0;
+  padding-top: 22px;
+  border-top: 1px solid #e5e5e7;
   text-align: center;
   color: #6e6e73;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .auth-switch button {
   padding: 0;
   border: 0;
   background: transparent;
-  color: #0071e3;
+  color: #0066cc;
   cursor: pointer;
   font-size: inherit;
 }
 
-.auth-links,
-footer {
+.auth-links {
+  margin-top: 26px;
   color: #86868b;
-  font-size: 10px;
+  font-size: 11px;
   text-align: center;
 }
 
 .error-message {
   padding: 12px 13px;
-  border-radius: 11px;
-  background: rgba(255,59,48,.08);
-  border: 1px solid rgba(255,59,48,.17);
+  border-radius: 9px;
+  background: #fff2f2;
+  border: 1px solid #ffd6d6;
   color: #b3261e;
-  font-size: 12px;
-  animation: errorIn .25s ease both;
+  font-size: 13px;
+  animation: errorIn .2s ease both;
 }
 
 @keyframes errorIn {
@@ -299,7 +271,7 @@ footer {
 
 .account-card,
 .developer-card {
-  padding: 34px 39px 39px;
+  padding: 34px 40px 40px;
 }
 
 .account-top {
@@ -310,27 +282,27 @@ footer {
 
 .profile-circle,
 .developer-icon {
-  width: 68px;
-  height: 68px;
-  margin-top: 46px;
+  width: 72px;
+  height: 72px;
+  margin-top: 38px;
   display: grid;
   place-items: center;
   border-radius: 50%;
   background: #1d1d1f;
-  color: white;
-  font-size: 23px;
+  color: #fff;
+  font-size: 24px;
   font-weight: 650;
 }
 
 .developer-icon {
-  border-radius: 19px;
+  border-radius: 18px;
   background: #f5f5f7;
   border: 1px solid #d2d2d7;
   color: #0071e3;
 }
 
 .account-copy {
-  margin: 22px 0 27px;
+  margin: 18px 0 24px;
 }
 
 .account-row {
@@ -342,8 +314,8 @@ footer {
   margin-bottom: 16px;
   border-top: 1px solid #d2d2d7;
   border-bottom: 1px solid #d2d2d7;
-  color: #6e6e73;
-  font-size: 12px;
+  color: #424245;
+  font-size: 13px;
 }
 
 .account-row span:last-child {
@@ -352,7 +324,7 @@ footer {
 }
 
 .developer-list {
-  margin: 27px 0;
+  margin: 24px 0;
   border-top: 1px solid #d2d2d7;
   border-bottom: 1px solid #d2d2d7;
 }
@@ -362,7 +334,8 @@ footer {
   grid-template-columns: 1fr auto auto;
   align-items: center;
   gap: 16px;
-  padding: 17px 0;
+  min-height: 62px;
+  padding: 12px 0;
   border-bottom: 1px solid #e5e5e7;
 }
 
@@ -371,13 +344,13 @@ footer {
 }
 
 .developer-list b {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
 }
 
 .developer-list span {
   color: #86868b;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .developer-list i {
@@ -391,22 +364,25 @@ footer {
   gap: 5px;
   padding: 14px;
   margin-bottom: 14px;
-  border-radius: 12px;
-  background: rgba(52,199,89,.08);
-  border: 1px solid rgba(52,199,89,.18);
+  border-radius: 10px;
+  background: #f1faf3;
+  border: 1px solid #ccebd3;
   color: #248a3d;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .success-message span {
   color: #5c8d67;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 footer {
   position: relative;
   z-index: 2;
-  padding: 22px;
+  padding: 22px 24px;
+  color: #86868b;
+  font-size: 11px;
+  text-align: center;
 }
 
 .boot-screen {
@@ -438,32 +414,32 @@ footer {
 @media (max-width: 650px) {
   .site-header {
     height: 58px;
-    padding: 0 15px;
+    padding: 0 16px;
   }
 
   nav button {
-    padding: 7px 6px;
-    font-size: 10px;
+    padding: 7px 8px;
+    font-size: 12px;
   }
 
   main {
-    padding: 32px 13px;
+    padding: 34px 14px 65px;
   }
 
   .auth-card,
   .account-card,
   .developer-card {
-    padding: 30px 22px;
-    border-radius: 22px;
+    padding: 30px 24px;
+    border-radius: 17px;
+  }
+
+  .auth-card > .logo {
+    margin-bottom: 36px;
   }
 
   .auth-copy h1,
   .account-copy h1 {
-    font-size: 27px;
-  }
-
-  .auth-copy {
-    margin-top: 46px;
+    font-size: 28px;
   }
 
   .developer-list span {
