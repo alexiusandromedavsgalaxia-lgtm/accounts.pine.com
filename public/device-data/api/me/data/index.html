@@ -1,20 +1,51 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pine Device Data</title>
-<style>body{font-family:system-ui;margin:0;background:#f5f5f7;color:#111}main{max-width:900px;margin:auto;padding:40px 20px}.card{background:white;border-radius:18px;padding:20px;margin:14px 0;box-shadow:0 2px 12px #0001}pre{white-space:pre-wrap;overflow:auto}small{color:#666}</style></head>
-<body><main><h1>Datos sincronizados</h1><p id="status">Cargando datos de tu cuenta…</p><div id="app"></div></main>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pine · Datos sincronizados</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Inter,system-ui,sans-serif;color:#f5f7fb;background:#07090d;--glass:rgba(255,255,255,.075);--line:rgba(255,255,255,.11);--muted:#9da5b4;--blue:#4d8dff}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(900px 500px at 15% -10%,#173b72 0,transparent 60%),radial-gradient(800px 500px at 100% 0,#3a185f 0,transparent 55%),#07090d}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(120deg,rgba(255,255,255,.025),transparent 35%,rgba(255,255,255,.018));}
+main{width:min(1180px,calc(100% - 32px));margin:auto;padding:32px 0 70px}.nav{height:58px;display:flex;align-items:center;justify-content:space-between;margin-bottom:34px}.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px}.pine{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(145deg,#fff,#b9c8ff);color:#111;box-shadow:0 8px 30px #0005}.pill{padding:9px 13px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.055);color:#dce2ed;font-size:13px}
+.hero{padding:35px 0 28px}.eyebrow{color:#83aaff;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.hero h1{font-size:clamp(38px,6vw,68px);line-height:.98;letter-spacing:-.055em;margin:10px 0 15px}.hero p{color:var(--muted);font-size:17px;max-width:650px;line-height:1.6;margin:0}.profile{margin-top:26px;padding:18px 20px;border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(24px);border-radius:22px;display:flex;justify-content:space-between;align-items:center;gap:20px}.profile strong{font-size:16px}.profile span{display:block;color:var(--muted);font-size:13px;margin-top:4px}.status{display:flex;align-items:center;gap:8px;color:#bfe8ce;font-size:13px}.dot{width:8px;height:8px;border-radius:50%;background:#52d681;box-shadow:0 0 14px #52d681}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.stat{padding:18px;border:1px solid var(--line);border-radius:18px;background:var(--glass)}.stat b{display:block;font-size:25px;letter-spacing:-.03em}.stat span{display:block;color:var(--muted);font-size:12px;margin-top:5px}
+.toolbar{display:flex;gap:10px;align-items:center;margin:25px 0 15px}.search{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:14px;padding:13px 15px;color:#fff;outline:none;font-size:14px}.search:focus{border-color:#679bff}.select{background:#121620;color:#ddd;border:1px solid var(--line);border-radius:14px;padding:12px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{border:1px solid var(--line);background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.045));border-radius:22px;padding:20px;min-width:0;box-shadow:0 18px 50px #0002;backdrop-filter:blur(18px);transition:.2s}.card:hover{transform:translateY(-2px);border-color:rgba(120,160,255,.35)}.key{display:flex;justify-content:space-between;gap:15px;align-items:center}.key b{font-size:15px;overflow:hidden;text-overflow:ellipsis}.badge{font-size:11px;color:#9fbfff;background:#467fff1a;border:1px solid #467fff35;border-radius:999px;padding:5px 8px}.updated{font-size:11px;color:#71798a;margin:8px 0 13px}.value{margin:0;background:#05070a;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:14px;color:#d9deea;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;overflow:auto;max-height:280px}.empty{text-align:center;padding:55px 20px;border:1px dashed var(--line);border-radius:22px;color:var(--muted)}
+footer{margin-top:30px;color:#646c7a;font-size:12px;text-align:center}
+@media(max-width:720px){main{width:min(100% - 20px,1180px);padding-top:18px}.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.profile{align-items:flex-start;flex-direction:column}.toolbar{flex-direction:column}.search,.select{width:100%}}
+</style>
+</head>
+<body><main>
+<header class="nav"><div class="brand"><div class="pine">P</div><span>Pine Account</span></div><div class="pill">Device Data</div></header>
+<section class="hero"><div class="eyebrow">Account synchronization</div><h1>Your data,<br>across your devices.</h1><p>Un panel para inspeccionar los datos que Pine mantiene sincronizados entre tus dispositivos. Todo en una sola vista, sin la sopa de JSON de antes.</p>
+<div class="profile"><div><strong id="name">Cargando cuenta…</strong><span id="email"></span></div><div class="status"><i class="dot"></i> Sincronización activa</div></div></section>
+<section class="stats"><div class="stat"><b id="total">—</b><span>datos sincronizados</span></div><div class="stat"><b id="photos">—</b><span>fotos / imágenes</span></div><div class="stat"><b id="settings">—</b><span>configuración</span></div><div class="stat"><b id="devices">—</b><span>dispositivos</span></div></section>
+<div class="toolbar"><input id="search" class="search" placeholder="Buscar en tus datos…"><select id="filter" class="select"><option value="all">Todo</option><option value="photos">Fotos</option><option value="settings">Configuración</option><option value="devices">Dispositivos</option><option value="account">Cuenta</option><option value="other">Otros</option></select></div>
+<section id="app" class="grid"></section><footer>Pine · Datos sincronizados de tu cuenta</footer>
+</main>
 <script>
-async function load(){
- const hash=location.hash.slice(1);
- const status=document.getElementById("status");
- try{
-  const r=await fetch("/device-data/api/me/data"+(hash?"?user_id="+encodeURIComponent(hash):""));
-  const x=await r.json();
-  if(!r.ok) throw new Error(x.error||"No se pudieron cargar los datos");
-  status.textContent=x.data?.length?x.data.length+" datos sincronizados":"No hay datos sincronizados todavía";
-  document.getElementById("app").innerHTML=(x.data||[]).map(d=>"<section class='card'><b>"+esc(d.key)+"</b><small> · actualizado "+esc(d.updated_at)+"</small><pre>"+esc(format(d.value))+"</pre></section>").join("");
- }catch(e){status.textContent=e.message}
+let all=[],groups={};
+const esc=v=>String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
+const format=v=>{try{return JSON.stringify(JSON.parse(v),null,2)}catch{return v??""}};
+function render(){
+ const q=document.getElementById("search").value.toLowerCase(),f=document.getElementById("filter").value;
+ let data=f==="all"?all:(groups[f]||[]);
+ data=data.filter(d=>(d.key+" "+d.value).toLowerCase().includes(q));
+ const app=document.getElementById("app");
+ app.innerHTML=data.length?data.map(d=>'<article class="card"><div class="key"><b>'+esc(d.key)+'</b><span class="badge">SYNCED</span></div><div class="updated">Actualizado · '+esc(new Date(d.updated_at).toLocaleString())+'</div><pre class="value">'+esc(format(d.value))+'</pre></article>').join(""):'<div class="empty">No hay datos que coincidan con esta búsqueda.</div>';
 }
-function format(v){try{return JSON.stringify(JSON.parse(v),null,2)}catch{return v??""}}
-function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;")}
-load();
+async function load(){
+ try{
+  const hash=location.hash.slice(1),r=await fetch("/device-data/api/me/data"+(hash?"?user_id="+encodeURIComponent(hash):"")),x=await r.json();
+  if(!r.ok)throw Error(x.error||"No se pudieron cargar los datos");
+  all=x.data||[];groups=x.groups||{};
+  document.getElementById("name").textContent=x.user?.name||"Cuenta Pine";
+  document.getElementById("email").textContent=x.user?.email||"";
+  document.getElementById("total").textContent=all.length;
+  for(const k of ["photos","settings","devices"])document.getElementById(k).textContent=(groups[k]||[]).length;
+  render();
+ }catch(e){document.getElementById("app").innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
+}
+document.getElementById("search").oninput=render;document.getElementById("filter").onchange=render;load();
 </script></body></html>
