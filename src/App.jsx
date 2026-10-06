@@ -18,12 +18,7 @@ const Logo = () => (
 );
 
 function Field({ label, ...props }) {
-  return (
-    <label className="field">
-      <span>{label}</span>
-      <input {...props} />
-    </label>
-  );
+  return <label className="field"><span>{label}</span><input {...props} /></label>;
 }
 
 function Auth({ register, setRegister, setUser }) {
@@ -58,25 +53,24 @@ function Auth({ register, setRegister, setUser }) {
           <h1>{register ? "Create your Pine Account" : "Sign in to Pine"}</h1>
           <p>{register ? "One account for everything Pine." : "Sign in to continue to your Pine Account."}</p>
         </div>
-
         <form onSubmit={submit} className="auth-form">
-          {register && (
-            <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" autoFocus />
-          )}
+          {register && <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" autoFocus />}
           <Field label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" autoFocus={!register} />
           <Field label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={register ? "new-password" : "current-password"} />
           {error && <div className="error-message">{error}</div>}
           <button className="continue-button" disabled={busy}>
-            <span>{busy ? (register ? "Creating…" : "Signing in…") : register ? "Create Account" : "Continue"}</span>
-            <span className="arrow">›</span>
+            <span>{busy ? (register ? "Creating…" : "Signing in…") : register ? "Create Account" : "Continue"}</span><span className="arrow">›</span>
           </button>
         </form>
-
         <div className="auth-switch">
           {register ? "Already have a Pine Account?" : "Don't have a Pine Account?"}
           <button onClick={() => setRegister(!register)}>{register ? " Sign in" : " Create yours now"}</button>
         </div>
-        <div className="auth-links">Privacy · Terms of Use</div>
+        <div className="auth-links">
+          <button type="button" onClick={() => alert("Pine Privacy Policy")}>Privacy</button>
+          <span> · </span>
+          <button type="button" onClick={() => alert("Pine Terms of Use")}>Terms of Use</button>
+        </div>
       </div>
     </div>
   );
@@ -84,6 +78,7 @@ function Auth({ register, setRegister, setUser }) {
 
 function Account({ user, setUser, setDev }) {
   const [signingOut, setSigningOut] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
   const logout = async () => {
     setSigningOut(true);
@@ -101,22 +96,25 @@ function Account({ user, setUser, setDev }) {
       <div className="account-card">
         <div className="account-top">
           <Logo />
-          <button className="text-button" onClick={logout} disabled={signingOut}>
-            {signingOut ? "Signing out…" : "Sign out"}
-          </button>
+          <button className="text-button" onClick={logout} disabled={signingOut}>{signingOut ? "Signing out…" : "Sign out"}</button>
         </div>
         <div className="profile-circle">{(user.name || user.email)[0].toUpperCase()}</div>
         <div className="account-copy">
           <h1>{user.name || "Your Pine Account"}</h1>
           <p>{user.email}</p>
         </div>
-        <div className="account-row">
-          <span>Your Pine Account</span>
-          <span>›</span>
-        </div>
+        <button className="account-row account-row-button" onClick={() => setShowDetails(!showDetails)}>
+          <span>Account details</span><span>{showDetails ? "⌃" : "›"}</span>
+        </button>
+        {showDetails && (
+          <div className="details-panel">
+            <div><span>Name</span><b>{user.name || "Not set"}</b></div>
+            <div><span>Email</span><b>{user.email}</b></div>
+            <div><span>Session</span><b>Active</b></div>
+          </div>
+        )}
         <button className="continue-button" onClick={() => setDev(true)}>
-          <span>Developer Account</span>
-          <span className="arrow">›</span>
+          <span>Developer Account</span><span className="arrow">›</span>
         </button>
       </div>
     </div>
@@ -127,6 +125,7 @@ function Developer({ setDev }) {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+  const [section, setSection] = useState(null);
 
   const create = async () => {
     setBusy(true);
@@ -141,6 +140,12 @@ function Developer({ setDev }) {
     }
   };
 
+  const sections = {
+    Projects: ["Your Pine projects", "Create and manage projects connected to your developer account."],
+    Credentials: ["Developer credentials", "API keys and developer access will appear here when configured."],
+    Services: ["Pine services", "Connect and manage the Pine services available to your projects."],
+  };
+
   return (
     <div className="developer-shell page-enter">
       <div className="developer-card">
@@ -149,25 +154,30 @@ function Developer({ setDev }) {
           <button className="text-button" onClick={() => setDev(false)}>Account</button>
         </div>
         <div className="developer-icon">⌘</div>
-        <div className="account-copy">
-          <h1>Pine Developer</h1>
-          <p>Build, test and ship with Pine.</p>
-        </div>
+        <div className="account-copy"><h1>Pine Developer</h1><p>Build, test and ship with Pine.</p></div>
+
         <div className="developer-list">
-          <div><b>Projects</b><span>Create and manage projects</span><i>›</i></div>
-          <div><b>Credentials</b><span>Manage developer access</span><i>›</i></div>
-          <div><b>Services</b><span>Connect Pine services</span><i>›</i></div>
+          {Object.entries(sections).map(([key, value]) => (
+            <button className="developer-item" key={key} onClick={() => setSection(section === key ? null : key)}>
+              <span className="developer-item-copy"><b>{key}</b><small>{value[1]}</small></span>
+              <i>{section === key ? "⌃" : "›"}</i>
+            </button>
+          ))}
         </div>
+
+        {section && (
+          <div className="developer-panel">
+            <b>{sections[section][0]}</b>
+            <span>{sections[section][1]}</span>
+          </div>
+        )}
+
         {error && <div className="error-message">{error}</div>}
         {done ? (
-          <div className="success-message">
-            <b>Developer Account ready.</b>
-            <span>Your Pine developer workspace has been created.</span>
-          </div>
+          <div className="success-message"><b>Developer Account ready.</b><span>Your Pine developer workspace has been created.</span></div>
         ) : (
           <button className="continue-button" onClick={create} disabled={busy}>
-            <span>{busy ? "Creating…" : "Create Developer Account"}</span>
-            <span className="arrow">›</span>
+            <span>{busy ? "Creating…" : "Create Developer Account"}</span><span className="arrow">›</span>
           </button>
         )}
       </div>
@@ -182,50 +192,27 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api("/api/auth/me")
-      .then((data) => setUser(data.user))
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
+    api("/api/auth/me").then((data) => setUser(data.user)).catch(() => setUser(null)).finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return (
-      <div className="boot-screen">
-        <Logo />
-        <div className="loader" />
-      </div>
-    );
-  }
+  if (loading) return <div className="boot-screen"><Logo /><div className="loader" /></div>;
 
   return (
     <div className="site">
-      <div className="ambient" />
-
       <header className="site-header">
         <Logo />
-        {!user && (
+        {!user ? (
           <nav>
             <button onClick={() => { setDeveloper(false); setRegister(false); }}>Sign in</button>
             <button onClick={() => { setDeveloper(false); setRegister(true); }}>Create Account</button>
           </nav>
-        )}
-        {user && (
-          <nav>
-            <button onClick={() => setDeveloper(!developer)}>
-              {developer ? "Account" : "Developer"}
-            </button>
-          </nav>
+        ) : (
+          <nav><button onClick={() => setDeveloper(!developer)}>{developer ? "Account" : "Developer"}</button></nav>
         )}
       </header>
-
       <main>
-        {user
-          ? developer
-            ? <Developer setDev={setDeveloper} />
-            : <Account user={user} setUser={setUser} setDev={setDeveloper} />
-          : <Auth register={register} setRegister={setRegister} setUser={setUser} />}
+        {user ? (developer ? <Developer setDev={setDeveloper} /> : <Account user={user} setUser={setUser} setDev={setDeveloper} />) : <Auth register={register} setRegister={setRegister} setUser={setUser} />}
       </main>
-
       <footer>© {new Date().getFullYear()} Pine · Privacy · Terms</footer>
     </div>
   );
