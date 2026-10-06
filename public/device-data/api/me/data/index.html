@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pine Device Data</title>
+<style>body{font-family:system-ui;margin:0;background:#f5f5f7;color:#111}main{max-width:900px;margin:auto;padding:40px 20px}.card{background:white;border-radius:18px;padding:20px;margin:14px 0;box-shadow:0 2px 12px #0001}pre{white-space:pre-wrap;overflow:auto}small{color:#666}</style></head>
+<body><main><h1>Datos sincronizados</h1><p id="status">Cargando datos de tu cuenta…</p><div id="app"></div></main>
+<script>
+async function load(){
+ const hash=location.hash.slice(1);
+ const status=document.getElementById("status");
+ try{
+  const r=await fetch("/device-data/api/me/data"+(hash?"?user_id="+encodeURIComponent(hash):""));
+  const x=await r.json();
+  if(!r.ok) throw new Error(x.error||"No se pudieron cargar los datos");
+  status.textContent=x.data?.length?x.data.length+" datos sincronizados":"No hay datos sincronizados todavía";
+  document.getElementById("app").innerHTML=(x.data||[]).map(d=>"<section class='card'><b>"+esc(d.key)+"</b><small> · actualizado "+esc(d.updated_at)+"</small><pre>"+esc(format(d.value))+"</pre></section>").join("");
+ }catch(e){status.textContent=e.message}
+}
+function format(v){try{return JSON.stringify(JSON.parse(v),null,2)}catch{return v??""}}
+function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;")}
+load();
+</script></body></html>
